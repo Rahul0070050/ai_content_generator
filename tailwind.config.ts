@@ -10,7 +10,14 @@ export default {
   theme: {
     extend: {
       colors: {
-        logo: "#192657",
+        logo: "var(--logo)",
+        search: {
+          background: {
+            start: "var(--search-gradient-from)",
+            mid: "var(--search-gradient-mid)",
+            end: "var(--search-gradient-end)",
+          },
+        },
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         card: {
@@ -23,7 +30,7 @@ export default {
         },
         primary: {
           DEFAULT: "#704ef8",
-          foreground: "hsl(var(--primary-foreground))",
+          background: "var(--primary-background)",
         },
         secondary: {
           DEFAULT: "hsl(var(--secondary))",

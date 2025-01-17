@@ -7,7 +7,7 @@ function Header() {
       <div className="flex gap-2 items-center p-2 border rounded-md max-w-md">
         <Search />
         <input
-          className="outline-none"
+          className="outline-none bg-background"
           type="text"
           name=""
           id=""
@@ -15,7 +15,7 @@ function Header() {
         />
       </div>
       <div>
-        <h2 className="bg-primary px-5 py-3 rounded-full font-semibold text-white cursor-pointer">
+        <h2 className="bg-primary-background px-5 py-3 rounded-full font-semibold text-white cursor-pointer">
           Unlock exclusive benefits for just $9.99/month! 🎉
         </h2>
       </div>

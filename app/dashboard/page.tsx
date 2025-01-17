@@ -1,5 +1,13 @@
+import Search from "./_components/Search";
+import TemplateList from "./_components/TemplateList";
+
 function Dashboard() {
-  return <div>Dashboard</div>;
+  return (
+    <div>
+      <Search />
+      <TemplateList />
+    </div>
+  );
 }
 
 export default Dashboard;

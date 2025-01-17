@@ -1,7 +1,8 @@
+"use client";
 import Image from "next/image";
-
 import { Roboto } from "next/font/google";
 import { FileClock, Home, Settings, WalletCards } from "lucide-react";
+import { usePathname } from "next/navigation";
 
 const roboto = Roboto({
   weight: "900",
@@ -9,6 +10,7 @@ const roboto = Roboto({
 });
 
 function SideNav() {
+  const path = usePathname();
   const NavLinks = [
     {
       name: "Home",
@@ -37,11 +39,17 @@ function SideNav() {
         <Image src={"logo.svg"} alt="logo" width={35} height={35} />
         <span className="text-2xl text-logo">Scriptify</span>
       </div>
-      <div className="mt-10">
+      <hr className="my-6 border" />
+      <div className="mt-3">
         {NavLinks.map((menuItem, index) => (
-          <div className="flex gap-2 mb-2 p-3 items-center hover:bg-primary hover:text-white rounded-lg cursor-pointer">
-            <menuItem.icon />
-            <h1>{menuItem.name}</h1>
+          <div
+            key={menuItem.path}
+            className={`flex gap-2 mb-2 p-3 items-center hover:bg-primary-background hover:text-white rounded-lg cursor-pointer ${
+              menuItem.path == path && "bg-primary-background text-white"
+            }`}
+          >
+            <menuItem.icon className="h-6 w-6" />
+            <h2 className="text-lg">{menuItem.name}</h2>
           </div>
         ))}
       </div>
