@@ -3,6 +3,8 @@ import Image from "next/image";
 import { Roboto } from "next/font/google";
 import { FileClock, Home, Settings, WalletCards } from "lucide-react";
 import { usePathname } from "next/navigation";
+import Link from "next/link";
+import logo from "../../../public/logo.svg";
 
 const roboto = Roboto({
   weight: "900",
@@ -34,11 +36,13 @@ function SideNav() {
     },
   ];
   return (
-    <div className={`h-screen p-5 border ${roboto.className}`}>
-      <div className="flex justify-center items-center gap-2">
-        <Image src={"logo.svg"} alt="logo" width={35} height={35} />
-        <span className="text-2xl text-logo">Scriptify</span>
-      </div>
+    <div className={`h-screen p-5 border bg-white ${roboto.className}`}>
+      <Link href={"/dashboard"}>
+        <div className="flex justify-center items-center gap-2">
+          <Image src={logo} alt="logo" width={35} height={35} />
+          <span className="text-2xl text-logo">Scriptify</span>
+        </div>
+      </Link>
       <hr className="my-6 border" />
       <div className="mt-3">
         {NavLinks.map((menuItem, index) => (
