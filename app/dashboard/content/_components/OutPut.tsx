@@ -4,6 +4,7 @@ import "@toast-ui/editor/dist/toastui-editor.css";
 import { Button } from "@/components/ui/button";
 import { Copy } from "lucide-react";
 import { useEffect, useRef } from "react";
+import { ToastContainer, toast } from "react-toastify";
 
 interface PROPS {
   result: string;
@@ -17,11 +18,23 @@ function OutPut({ result }: PROPS) {
     editorInstance.setMarkdown(result);
     // console.log("result ", result);
   }, [result]);
+
+  function copyText() {
+    if (result == "") {
+      toast.error("No text to copy");
+      return;
+    }
+    navigator.clipboard.writeText(result);
+    toast.success("Copied to clipboard", {
+      position: "bottom-right",
+    });
+  }
   return (
     <div className="bg-white shadow-lg border rounded-lg">
+      <ToastContainer />
       <div className="flex justify-between items-center p-5">
         <h2 className="font-medium text-lg">Your Result</h2>
-        <Button className="flex gap-2 text-white font-bold">
+        <Button className="flex gap-2 text-white font-bold" onClick={copyText}>
           <Copy className="w-4 h-4" /> Copy
         </Button>
       </div>

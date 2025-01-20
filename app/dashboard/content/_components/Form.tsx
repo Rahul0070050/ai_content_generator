@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Loader2Icon } from "lucide-react";
 
 interface PROPS {
-  selectedTemplate?: TEMPLATE;
+  selectedTemplate?: TEMPLATE | null;
   userFormInput: any;
   loading: boolean;
 }

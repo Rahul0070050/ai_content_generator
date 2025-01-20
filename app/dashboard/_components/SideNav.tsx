@@ -5,6 +5,7 @@ import { FileClock, Home, Settings, WalletCards } from "lucide-react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import logo from "../../../public/logo.svg";
+import UsageTrack from "./UsageTrack";
 
 const roboto = Roboto({
   weight: "900",
@@ -36,7 +37,9 @@ function SideNav() {
     },
   ];
   return (
-    <div className={`h-screen p-5 border bg-white ${roboto.className}`}>
+    <div
+      className={`h-screen p-5 border bg-white ${roboto.className} relative`}
+    >
       <Link href={"/dashboard"}>
         <div className="flex justify-center items-center gap-2">
           <Image src={logo} alt="logo" width={35} height={35} />
@@ -46,16 +49,24 @@ function SideNav() {
       <hr className="my-6 border" />
       <div className="mt-3">
         {NavLinks.map((menuItem, index) => (
-          <div
+          <Link
             key={menuItem.path}
-            className={`flex gap-2 mb-2 p-3 items-center hover:bg-primary-background hover:text-white rounded-lg cursor-pointer ${
-              menuItem.path == path && "bg-primary-background text-white"
-            }`}
+            href={menuItem.path}
+            // className={`flex items-center gap-2 text-sm ${path === menuItem.path ? "text-blue" : "text-gray-500"}`}
           >
-            <menuItem.icon className="h-6 w-6" />
-            <h2 className="text-lg">{menuItem.name}</h2>
-          </div>
+            <div
+              className={`flex gap-2 mb-2 p-3 items-center hover:bg-primary-background hover:text-white rounded-lg cursor-pointer ${
+                menuItem.path == path && "bg-primary-background text-white"
+              }`}
+            >
+              <menuItem.icon className="h-6 w-6" />
+              <h2 className="text-lg">{menuItem.name}</h2>
+            </div>
+          </Link>
         ))}
+      </div>
+      <div className="absolute bottom-10 left-0 w-full">
+        <UsageTrack />
       </div>
     </div>
   );
