@@ -3,12 +3,18 @@ import React, { createContext, useReducer } from "react";
 
 interface STATE {
   usedCredit: number;
+  totalCreadits: number;
+  subscriptionType: string;
+  unlimited: boolean;
   user: any;
 }
 
 // Define initial state
 const initialState: STATE = {
   usedCredit: 0,
+  totalCreadits: 10000,
+  subscriptionType: "basic",
+  unlimited: false,
   user: null,
 };
 
@@ -16,7 +22,9 @@ const initialState: STATE = {
 type ActionType =
   | { type: "UPDATE_USED_CREDIT"; payload: number }
   | { type: "SET_USED_CREDIT"; payload: number }
-  | { type: "SET_USER"; payload: string };
+  | { type: "SET_TOTAL_CREDITS"; payload: number }
+  | { type: "SET_SUBSCRIPTION_TYPE"; payload: string }
+  | { type: "SET_UNLIMITED_CREDITS" };
 
 // Define the context value type
 export interface ContextType {
@@ -28,19 +36,31 @@ export interface ContextType {
 const reducer = (state: STATE, action: ActionType) => {
   switch (action.type) {
     case "SET_USED_CREDIT":
-      console.log("inside dispath", action.payload);
-      return { ...state, usedCredit: action.payload };
+      return {
+        ...state,
+        usedCredit: action.payload,
+      };
     case "UPDATE_USED_CREDIT":
-      return { ...state, usedCredit: state.usedCredit + action.payload };
-    case "SET_USER":
-      return { ...state, user: action.payload };
+      return {
+        ...state,
+        usedCredit: state.usedCredit + action.payload,
+      };
+    case "SET_TOTAL_CREDITS":
+      return { ...state, totalCreadits: action.payload };
+    case "SET_UNLIMITED_CREDITS":
+      return { ...state, unlimited: true };
+    case "SET_SUBSCRIPTION_TYPE":
+      return { ...state, subscriptionType: action.payload };
     default:
       return state;
   }
 };
 
 // Create the context
-export const AppContext = createContext<ContextType | undefined>(undefined);
+export const AppContext = createContext<ContextType>({
+  state: initialState,
+  dispatch: () => null,
+});
 
 // 2. Create a Context Provider
 export const AppProvider = ({ children }: { children: React.ReactNode }) => {

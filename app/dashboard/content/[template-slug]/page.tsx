@@ -95,7 +95,7 @@ function CreateNewContent({ params }: PROPS) {
         formData: formData,
         templateSlug: slug,
         createdBy: user?.primaryEmailAddress?.emailAddress || "Anonymous",
-        createdAt: moment().format("YYYY-MM-DD"),
+        createdAt: moment().toISOString(),
       });
     } catch (error) {
       toast.error("Error saving to database");

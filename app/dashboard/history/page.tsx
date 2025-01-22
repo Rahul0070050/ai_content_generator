@@ -79,7 +79,7 @@ function History() {
             </thead>
             <tbody>
               {historyData.map((item, index) => (
-                <tr>
+                <tr key={item.id}>
                   {/* <td className="p-4">{item.id}</td> */}
                   <td className="border p-4">{item.templateSlug}</td>
                   <td className="border p-4 w-[30%] text-wrap">
