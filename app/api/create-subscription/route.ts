@@ -4,7 +4,7 @@ import Razorpay from "razorpay";
 interface SubscriptionType {
   plan: string;
 }
-export async function POST(req: Request, res: any) {
+export async function POST(req: Request) {
   if (req.method === "POST") {
     const { type } = await req.json();
     let plan_id = process.env.NEXT_PUBLIC_RAZORPAY_WEEKLEY_PLAN;
