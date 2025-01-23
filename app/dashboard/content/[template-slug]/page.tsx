@@ -17,9 +17,7 @@ import { ContextType } from "@/app/(context)/reduser";
 import { ToastContainer, toast } from "react-toastify";
 
 interface PROPS {
-  params: {
-    "template-slug": string;
-  };
+  params: Promise<{ "template-slug": string }>;
 }
 
 function CreateNewContent({ params }: PROPS) {
@@ -31,12 +29,15 @@ function CreateNewContent({ params }: PROPS) {
   const [selectedTemplate, setSelectedTemplate] = useState<TEMPLATE | null>(
     null
   );
-  const state: ContextType | undefined = useAppContext();
+  const state: ContextType = useAppContext();
 
   useEffect(() => {
     const initialize = async () => {
       try {
-        const slug = params["template-slug"];
+        let slugResp = await params;
+        let slug = slugResp["template-slug"];
+
+        if (!slug) return;
         setTemplateSlug(slug);
 
         // Find the selected template directly using the resolved slug
