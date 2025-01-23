@@ -36,8 +36,7 @@ function CreateNewContent({ params }: PROPS) {
   useEffect(() => {
     const initialize = async () => {
       try {
-        const resolvedParams = await params; // Unwrap the `params` Promise
-        const slug = resolvedParams["template-slug"];
+        const slug = params["template-slug"];
         setTemplateSlug(slug);
 
         // Find the selected template directly using the resolved slug
