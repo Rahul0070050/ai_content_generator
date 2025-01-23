@@ -85,3 +85,20 @@
 [class="cl-internal-1dauvpw"] {
   display: none !important;
 }
+
+[data-clerk-component="UserProfile"] {
+  width: 100%;
+  height: 75vh;
+}
+
+[data-clerk-component="UserProfile"] .cl-internal-1ywu49i {
+  width: 100%;
+  height: 100%;
+}
+
+[data-clerk-component="UserProfile"] .cl-internal-to9o31 {
+  display: none;
+}
+.cl-userButtonPopoverFooter {
+  display: none;
+}

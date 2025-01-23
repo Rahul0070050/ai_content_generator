@@ -18,8 +18,6 @@ interface PROPS {
   handleSubscription: any;
 }
 function SubscriptionPlane({ plan, handleSubscription, currentPlane }: PROPS) {
-  console.log("currentPlane ", currentPlane);
-
   return (
     <div className="shadow-md rounded-xl hover:scale-105 transition-all grid-cols-1 p-5 border bg-white h-fit">
       <h1 className="text-4xl font-bold my-3 text-center">

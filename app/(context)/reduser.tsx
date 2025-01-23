@@ -50,6 +50,9 @@ const reducer = (state: STATE, action: ActionType) => {
     case "SET_UNLIMITED_CREDITS":
       return { ...state, unlimited: true };
     case "SET_SUBSCRIPTION_TYPE":
+      if (action.payload == "year") {
+        return { ...state, subscriptionType: action.payload, unlimited: false };
+      }
       return { ...state, subscriptionType: action.payload };
     default:
       return state;

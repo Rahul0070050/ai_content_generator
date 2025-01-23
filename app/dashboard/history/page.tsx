@@ -54,7 +54,7 @@ function History() {
   }
 
   return (
-    <div className="p-10">
+    <div className="max-sm:px-5 px-10 py-5">
       <ToastContainer />
       <Button className="text-white font-bold" onClick={() => router.back()}>
         <ArrowLeft />

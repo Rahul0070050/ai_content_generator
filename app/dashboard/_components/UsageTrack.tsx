@@ -52,24 +52,25 @@ function UsageTrack() {
       .limit(1);
 
     let totalCredits = 10000;
-
     if (result.length > 0) {
       const subscription = result[0];
+
       state.dispatch({
         type: "SET_SUBSCRIPTION_TYPE",
         payload: subscription.type,
       });
       if (subscription.type == "week") {
         totalCredits = 50000;
+        console.log("subscription.type ", totalCredits);
       } else if (subscription.type == "month") {
         totalCredits = 250000;
       } else if (subscription.type == "year") {
         state.dispatch({
           type: "SET_UNLIMITED_CREDITS",
         });
+        setIsPremiumMember(true);
       }
-      setIsPremiumMember(true);
-      setTotalCreadits(totalCreadits);
+      setTotalCreadits(totalCredits);
       getAIResponseByDate(subscription.joinDate);
     } else {
       const endDateDate = moment().add(1, "week").toDate();
@@ -81,15 +82,18 @@ function UsageTrack() {
     });
   }
 
-  function GetTotalUsage(result: HISTORY[]) {
-    let totalUsedCreadits = 0;
-    result.forEach((item) => {
-      totalUsedCreadits += item.aiResponse.length;
-    });
+  useEffect(() => {
+    setCreditUsed(state.state.usedCredit);
+    setTotalCreadits(state.state.totalCreadits);
+  }, [state.state.usedCredit, state.state.totalCreadits]);
 
-    if (totalUsedCreadits > totalCreadits) {
-      totalUsedCreadits = totalCreadits;
-    }
+  function GetTotalUsage(result: HISTORY[]) {
+    let totalUsedCreadits = result.reduce(
+      (prev, current) => prev + current.aiResponse.length,
+      0
+    );
+
+    console.log("final totalUsedCreadits ", totalUsedCreadits);
     setCreditUsed(totalUsedCreadits);
     state.dispatch({
       type: "SET_USED_CREDIT",

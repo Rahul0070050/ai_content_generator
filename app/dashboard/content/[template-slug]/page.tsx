@@ -56,9 +56,11 @@ function CreateNewContent({ params }: PROPS) {
   }, [params]);
 
   const generateAIContent = async (formData: any) => {
-    if (state && state?.state.usedCredit >= 50000) {
-      toast.error("You have exceeded your daily credit limit.");
-      return;
+    if (!state.state.unlimited) {
+      if (state && state?.state.usedCredit >= 50000) {
+        toast.error("You have exceeded your daily credit limit.");
+        return;
+      }
     }
     if (!selectedTemplate) {
       console.error("No template selected.");
@@ -108,7 +110,7 @@ function CreateNewContent({ params }: PROPS) {
   }
 
   return (
-    <div className="p-10">
+    <div className="max-sm:px-5 px-10 py-5">
       <ToastContainer />
       <Button className="text-white font-bold" onClick={() => router.back()}>
         <ArrowLeft />
@@ -120,7 +122,7 @@ function CreateNewContent({ params }: PROPS) {
           selectedTemplate={selectedTemplate}
           userFormInput={(value: any) => generateAIContent(value)}
         />
-        <div className="col-span-2">
+        <div className="md:col-span-2">
           <OutPut result={result} />
         </div>
       </div>

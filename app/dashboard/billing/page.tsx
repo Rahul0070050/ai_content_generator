@@ -4,92 +4,37 @@ import { ArrowLeft, BadgeInfo, CircleCheck } from "lucide-react";
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 import { ToastContainer } from "react-toastify";
-import SubscriptionPlane, { PLAN } from "./_components/SubscriptionPlane";
+import SubscriptionPlane from "./_components/SubscriptionPlane";
 import axios from "axios";
 import { useUser } from "@clerk/nextjs";
 import { Subscriptions } from "@/utils/Schema";
 import { db } from "@/utils/DB";
 import moment from "moment";
 import { useAppContext } from "@/hooks/useAppContext";
+import { plans } from "@/app/(data)/SubscriptionPlans";
 
 function Billing() {
-  const plans: PLAN[] = [
-    {
-      title: "Free",
-      amount: "0.00",
-      period: "per Month",
-      desctiption: "Get started with essential AI tools for free.",
-      features: [
-        {
-          title: "10,000 credits",
-        },
-        {
-          title: "Community support",
-        },
-      ],
-    },
-    {
-      title: "Weekly",
-      amount: "20.00",
-      period: "per week",
-      desctiption: "Access premium features with a weekly billing cycle.",
-      features: [
-        {
-          title: "50,000 credits",
-        },
-        {
-          title: "Priority email support",
-        },
-        {
-          title: "Community support",
-        },
-      ],
-    },
-    {
-      title: "Monthly",
-      amount: "40.00",
-      period: "per Month",
-      desctiption: "Access premium features with a monthly billing cycle.",
-      features: [
-        {
-          title: "250,000 credits",
-        },
-        {
-          title: "Chat and email support",
-        },
-        {
-          title: "Community support",
-        },
-      ],
-    },
-    {
-      title: "Yearly",
-      amount: "450.00",
-      period: "per Year",
-      desctiption: "Access premium features with a yearly billing cycle.",
-      features: [
-        {
-          title: "Unlimited credits",
-        },
-        {
-          title: "Bulk operations",
-        },
-        {
-          title: "24/7 premium support",
-        },
-        {
-          title: "Community support",
-        },
-      ],
-    },
-  ];
-
   type PERIOD = "week" | "month" | "year";
   const router = useRouter();
-  const { state } = useAppContext();
+  const { state, dispatch } = useAppContext();
   const { user } = useUser();
   const [loading, setLoading] = useState(false);
   const [currentPlane, setCurrentPlan] = useState("");
+
+  function getCreditByType(type: PERIOD) {
+    let totalCredits = 10000;
+    if (type == "week") {
+      totalCredits = 50000;
+      console.log("type ", totalCredits);
+    } else if (type == "month") {
+      totalCredits = 250000;
+    } else if (type == "year") {
+      dispatch({
+        type: "SET_UNLIMITED_CREDITS",
+      });
+    }
+    return totalCredits;
+  }
 
   function handleSubscription(type: PERIOD) {
     setLoading(true);
@@ -118,6 +63,14 @@ function Billing() {
         console.log("Payment successful:", response);
         if (response) {
           saveSubscription(response?.razorpay_payment_id, type);
+          dispatch({
+            type: "SET_SUBSCRIPTION_TYPE",
+            payload: type,
+          });
+          dispatch({
+            type: "SET_TOTAL_CREDITS",
+            payload: getCreditByType(type),
+          });
         }
         setLoading(false);
       },
