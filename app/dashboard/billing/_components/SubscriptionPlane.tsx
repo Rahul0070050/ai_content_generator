@@ -75,18 +75,20 @@ export default function SubscriptionPlan({
       </div>
 
       {/* Call-to-Action Section */}
-      <div className="mt-6">
-        <Button
-          className={`w-full py-4 font-semibold text-white rounded-xl transition-colors ${
-            isActive ? "bg-green-600" : "bg-blue-600 hover:bg-blue-700"
-          }`}
-          onClick={() => handleSubscription(plan.period)}
-          disabled={isLoading || isActive}
-          aria-label={isActive ? "Current Plan" : "Subscribe Now"}
-        >
-          {isActive ? "Current Plan" : "Subscribe Now"}
-        </Button>
-      </div>
+      {plan.amount != "0.00" && (
+        <div className="mt-6">
+          <Button
+            className={`w-full py-4 font-semibold text-white rounded-xl transition-colors ${
+              isActive ? "bg-green-600" : "bg-blue-600 hover:bg-blue-700"
+            }`}
+            onClick={() => handleSubscription(plan.period)}
+            disabled={isLoading || isActive}
+            aria-label={isActive ? "Current Plan" : "Subscribe Now"}
+          >
+            {isActive ? "Current Plan" : "Subscribe Now"}
+          </Button>
+        </div>
+      )}
 
       {/* Active Indicator */}
       {isActive && (
