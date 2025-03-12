@@ -4,7 +4,7 @@ export const plans: Plan[] = [
   {
     title: "Free",
     amount: "0.00",
-    period: "per Month",
+    period: "Normal",
     description: "Get started with essential AI tools for free.",
     features: [
       {
