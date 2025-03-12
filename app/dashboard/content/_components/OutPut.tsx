@@ -20,14 +20,24 @@ function OutPut({ result }: PROPS) {
   }, [result]);
 
   function copyText() {
-    if (result == "") {
+    if (result === "") {
       toast.error("No text to copy");
       return;
     }
-    navigator.clipboard.writeText(result);
-    toast.success("Copied to clipboard", {
-      position: "bottom-right",
-    });
+
+    if (typeof window !== "undefined" && navigator.clipboard) {
+      navigator.clipboard
+        .writeText(result)
+        .then(() => {
+          toast.success("Copied to clipboard", {
+            position: "bottom-right",
+          });
+        })
+        .catch((err) => {
+          toast.error("Failed to copy text");
+          console.error("Clipboard error:", err);
+        });
+    }
   }
   return (
     <div className="bg-white shadow-lg border rounded-lg">

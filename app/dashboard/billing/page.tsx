@@ -1,143 +1,170 @@
+// pages/billing.tsx
 "use client";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, BadgeInfo, CircleCheck } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
-import React, { useState } from "react";
-import { ToastContainer } from "react-toastify";
-import SubscriptionPlane from "./_components/SubscriptionPlane";
+import React, { useState, useCallback, useEffect } from "react";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import SubscriptionPlan, { Period } from "./_components/SubscriptionPlane";
 import axios from "axios";
 import { useUser } from "@clerk/nextjs";
-import { Subscriptions } from "@/utils/Schema";
 import { db } from "@/utils/DB";
+import { Subscriptions } from "@/utils/Schema";
 import moment from "moment";
 import { useAppContext } from "@/hooks/useAppContext";
 import { plans } from "@/app/(data)/SubscriptionPlans";
+import { Plan } from "./_components/SubscriptionPlane";
 
-function Billing() {
-  type PERIOD = "week" | "month" | "year";
+export default function Billing() {
   const router = useRouter();
   const { state, dispatch } = useAppContext();
-  const { user } = useUser();
+  const { user, isLoaded } = useUser();
   const [loading, setLoading] = useState(false);
-  const [currentPlane, setCurrentPlan] = useState("");
 
-  function getCreditByType(type: PERIOD) {
-    let totalCredits = 10000;
-    if (type == "week") {
-      totalCredits = 50000;
-      console.log("type ", totalCredits);
-    } else if (type == "month") {
-      totalCredits = 250000;
-    } else if (type == "year") {
-      dispatch({
-        type: "SET_UNLIMITED_CREDITS",
-      });
-    }
-    return totalCredits;
-  }
+  const getCreditByType = useCallback(
+    (type: Plan["period"]): number => {
+      switch (type) {
+        case "per Week":
+          return 50000;
+        case "per Month":
+          return 250000;
+        case "per Year":
+          dispatch({ type: "SET_UNLIMITED_CREDITS" });
+          return Infinity;
+        default:
+          return 10000;
+      }
+    },
+    [dispatch]
+  );
 
-  function handleSubscription(type: PERIOD) {
+  const handleSubscription = useCallback(async (type: Plan["period"]) => {
     setLoading(true);
-    console.log("Handle subscription:", type);
-
-    axios
-      .post("/api/create-subscription", JSON.stringify({ type }))
-      .then((res) => {
-        console.log(res.data);
-        setCurrentPlan(type);
-        onSubscription(res.data.id, type);
-      })
-      .catch((err) => {
-        console.error("Error creating subscription:", err);
-        setLoading(false);
-      });
-  }
-
-  function onSubscription(subId: string, type: PERIOD) {
-    const options = {
-      key: process.env.NEXT_PUBLIC_KEY_ID || "",
-      subscription_id: subId,
-      name: "Scriptify AI Apps",
-      description: `${type} Subscription`,
-      handler: async (response: any) => {
-        console.log("Payment successful:", response);
-        if (response) {
-          saveSubscription(response?.razorpay_payment_id, type);
-          dispatch({
-            type: "SET_SUBSCRIPTION_TYPE",
-            payload: type,
-          });
-          dispatch({
-            type: "SET_TOTAL_CREDITS",
-            payload: getCreditByType(type),
-          });
-        }
-        setLoading(false);
-      },
-      prefill: {
-        email: user?.primaryEmailAddress?.emailAddress, // Prefill customer details if available
-      },
-    };
-
-    if (!options.key) {
-      console.error(
-        "Razorpay Key ID is missing. Check your environment variables."
-      );
-      setLoading(false);
-      return;
-    }
-
     try {
-      // @ts-ignore
-      if (typeof window !== "undefined" && window.Razorpay) {
-        // @ts-ignore
-        const rzp = new window.Razorpay(options);
-        rzp.open();
-      } else {
-        throw new Error("Razorpay is not available in the current context.");
-      }
+      const response = await axios.post("/api/create-subscription", { type });
+      onSubscription(response.data.id, type);
     } catch (error) {
-      console.error("Error initializing Razorpay:", error);
+      console.error("Subscription error:", error);
+      toast.error("Failed to create subscription. Please try again.");
       setLoading(false);
     }
-  }
+  }, []);
 
-  async function saveSubscription(paymentId: string, type: PERIOD) {
-    const endDateDate = moment().add(1, type).toDate();
-    if (user?.primaryEmailAddress?.emailAddress && user?.fullName) {
-      const result = await db.insert(Subscriptions).values({
-        email: user?.primaryEmailAddress?.emailAddress,
-        userName: user?.fullName,
-        type: type,
-        paymentId: paymentId,
-        joinDate: moment().toDate(),
-        endDate: endDateDate,
-      });
+  const onSubscription = useCallback(
+    (subId: string, type: Plan["period"]) => {
+      const options = {
+        key: process.env.NEXT_PUBLIC_KEY_ID || "",
+        subscription_id: subId,
+        name: "Scriptify AI Apps",
+        description: `${type} Subscription`,
+        handler: async (response: any) => {
+          try {
+            console.log("type ", type);
+            saveSubscription(response.razorpay_payment_id, type);
+            dispatch({ type: "SET_SUBSCRIPTION_TYPE", payload: type });
+            dispatch({
+              type: "SET_TOTAL_CREDITS",
+              payload: getCreditByType(type),
+            });
+            toast.success("Subscription activated successfully!");
+          } catch (error) {
+            toast.error("Error processing payment");
+          } finally {
+            setLoading(false);
+          }
+        },
+        prefill: {
+          email: user?.primaryEmailAddress?.emailAddress,
+          name: user?.fullName,
+        },
+        theme: {
+          color: "#2563eb",
+        },
+      };
 
-      if (result) {
-        // router.push("/");
+      if (!options.key) {
+        toast.error("Payment configuration error");
+        setLoading(false);
+        return;
       }
-    }
+
+      if (!user?.primaryEmailAddress?.emailAddress || !user?.fullName) {
+        setLoading(false);
+        return toast.error("Some error occurred try again later");
+      }
+      // @ts-ignore
+      const rzp = new window.Razorpay(options);
+      rzp.on("payment.failed", () => {
+        toast.error("Payment failed. Please try again.");
+        setLoading(false);
+      });
+      rzp.open();
+    },
+    [user, dispatch, getCreditByType]
+  );
+
+  const saveSubscription = async (paymentId: string, type: Plan["period"]) => {
+    console.log(user?.primaryEmailAddress?.emailAddress, user?.fullName);
+
+    if (!user?.primaryEmailAddress?.emailAddress || !user?.fullName) return;
+
+    const endDate = moment()
+      .add(1, type.slice(4, type.length).toLowerCase() as Period)
+      .toDate();
+    // console.log("endDate ", type.slice(4, type.length).toLowerCase());
+    // console.log("endDate ", endDate);
+
+    await db.insert(Subscriptions).values({
+      email: user.primaryEmailAddress.emailAddress,
+      userName: user.fullName,
+      type,
+      paymentId,
+      joinDate: new Date(),
+      endDate,
+    });
+  };
+
+  if (!isLoaded) {
+    return <div>{user}</div>;
   }
+
   return (
-    <div className="max-sm:p-5 p-10">
-      <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-      <ToastContainer />
-      <Button className="text-white font-bold" onClick={() => router.back()}>
-        <ArrowLeft />
-        Back
-      </Button>
-      <div className="p-5">
-        {/* <h2 className="font-bold text-4xl mb-1 p-4 text-center">
-          Choose the Perfect Plan for Your Needs
-        </h2> */}
-        <div className="grid md:grid-cols-2 grid-cols-1 gap-10 max-sm:p-1 p-10">
+    <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
+      <script src="https://checkout.razorpay.com/v1/checkout.js" async />
+      <ToastContainer position="top-right" autoClose={3000} />
+
+      <div className="max-w-7xl mx-auto">
+        <div className="flex items-center justify-between mb-8">
+          {/* <Button
+            variant="ghost"
+            onClick={() => router.back()}
+            className="flex items-center gap-2"
+          >
+            <ArrowLeft className="w-5 h-5" />
+            Back
+          </Button> */}
+          <Button
+            className="text-white font-bold"
+            onClick={() => router.back()}
+          >
+            <ArrowLeft />
+            Back
+          </Button>
+        </div>
+
+        {/* <h1 className="text-3xl md:text-4xl font-bold text-center text-gray-800 mb-10">
+          Choose Your Perfect Plan
+        </h1> */}
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {plans.map((plan) => (
-            <SubscriptionPlane
+            <SubscriptionPlan
               key={plan.title}
               plan={plan}
-              currentPlane={state.subscriptionType}
+              currentPlan={state.subscriptionType}
               handleSubscription={handleSubscription}
+              isLoading={loading}
             />
           ))}
         </div>
@@ -145,5 +172,3 @@ function Billing() {
     </div>
   );
 }
-
-export default Billing;

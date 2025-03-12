@@ -47,10 +47,24 @@ function History() {
   }
 
   function copyText(aiResponse: string) {
-    navigator.clipboard.writeText(aiResponse);
-    toast.success("Copied to clipboard", {
-      position: "bottom-right",
-    });
+    if (aiResponse === "") {
+      toast.error("No text to copy");
+      return;
+    }
+
+    if (typeof window !== "undefined" && navigator.clipboard) {
+      navigator.clipboard
+        .writeText(aiResponse)
+        .then(() => {
+          toast.success("Copied to clipboard", {
+            position: "bottom-right",
+          });
+        })
+        .catch((err) => {
+          toast.error("Failed to copy text");
+          console.error("Clipboard error:", err);
+        });
+    }
   }
 
   return (

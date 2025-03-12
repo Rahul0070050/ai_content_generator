@@ -1,11 +1,11 @@
-import { PLAN } from "../dashboard/billing/_components/SubscriptionPlane";
+import { Plan } from "../dashboard/billing/_components/SubscriptionPlane";
 
-export const plans: PLAN[] = [
+export const plans: Plan[] = [
   {
     title: "Free",
     amount: "0.00",
     period: "per Month",
-    desctiption: "Get started with essential AI tools for free.",
+    description: "Get started with essential AI tools for free.",
     features: [
       {
         title: "10,000 credits",
@@ -18,8 +18,8 @@ export const plans: PLAN[] = [
   {
     title: "Weekly",
     amount: "20.00",
-    period: "per week",
-    desctiption: "Access premium features with a weekly billing cycle.",
+    period: "per Week",
+    description: "Access premium features with a weekly billing cycle.",
     features: [
       {
         title: "50,000 credits",
@@ -36,7 +36,7 @@ export const plans: PLAN[] = [
     title: "Monthly",
     amount: "40.00",
     period: "per Month",
-    desctiption: "Access premium features with a monthly billing cycle.",
+    description: "Access premium features with a monthly billing cycle.",
     features: [
       {
         title: "250,000 credits",
@@ -53,7 +53,7 @@ export const plans: PLAN[] = [
     title: "Yearly",
     amount: "450.00",
     period: "per Year",
-    desctiption: "Access premium features with a yearly billing cycle.",
+    description: "Access premium features with a yearly billing cycle.",
     features: [
       {
         title: "Unlimited credits",

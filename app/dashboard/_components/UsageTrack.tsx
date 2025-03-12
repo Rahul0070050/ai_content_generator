@@ -18,6 +18,13 @@ function UsageTrack() {
 
   useEffect(() => {
     getSubscription();
+    // db.delete(Subscriptions)
+    //   .where(
+    //     eq(Subscriptions.email, user?.primaryEmailAddress?.toString() || "")
+    //   )
+    //   .then((res) => {
+    //     console.log(res);
+    //   });
   }, [user]);
 
   async function getAIResponseByDate(date: Date) {
@@ -52,19 +59,17 @@ function UsageTrack() {
       .limit(1);
 
     let totalCredits = 10000;
+    let subscriptionType = "Normal";
+
     if (result.length > 0) {
       const subscription = result[0];
-
-      state.dispatch({
-        type: "SET_SUBSCRIPTION_TYPE",
-        payload: subscription.type,
-      });
-      if (subscription.type == "week") {
+      console.log("subscription ", subscription);
+      subscriptionType = subscription.type;
+      if (subscription.type == "per Week") {
         totalCredits = 50000;
-        console.log("subscription.type ", totalCredits);
-      } else if (subscription.type == "month") {
+      } else if (subscription.type == "per Month") {
         totalCredits = 250000;
-      } else if (subscription.type == "year") {
+      } else if (subscription.type == "per Year") {
         state.dispatch({
           type: "SET_UNLIMITED_CREDITS",
         });
@@ -77,15 +82,16 @@ function UsageTrack() {
       getAIResponseByDate(endDateDate);
     }
     state.dispatch({
+      type: "SET_SUBSCRIPTION_TYPE",
+      payload: subscriptionType,
+    });
+    state.dispatch({
       type: "SET_TOTAL_CREDITS",
       payload: totalCredits,
     });
   }
 
-  useEffect(() => {
-    setCreditUsed(state.state.usedCredit);
-    setTotalCreadits(state.state.totalCreadits);
-  }, [state.state.usedCredit, state.state.totalCreadits]);
+  useEffect(() => {}, [state.state.usedCredit, state.state.totalCreadits]);
 
   function GetTotalUsage(result: HISTORY[]) {
     let totalUsedCreadits = result.reduce(
@@ -93,7 +99,7 @@ function UsageTrack() {
       0
     );
 
-    console.log("final totalUsedCreadits ", totalUsedCreadits);
+    // console.log("final totalUsedCreadits ", totalUsedCreadits);
     setCreditUsed(totalUsedCreadits);
     state.dispatch({
       type: "SET_USED_CREDIT",
@@ -111,13 +117,18 @@ function UsageTrack() {
                 className="h-2 bg-white rounded-full"
                 style={{
                   width: state
-                    ? `${(creditUsed / totalCreadits) * 100}%`
+                    ? `${
+                        (state.state.usedCredit /
+                          state.state.totalCreadits) *
+                        100
+                      }%`
                     : "0%",
                 }}
               ></div>
             </div>
             <h2 className="my-2 text-sm">
-              {creditUsed || 0}/{totalCreadits} Creadit used
+              {state.state.usedCredit || 0}/{state.state.totalCreadits}{" "}
+              Creadit used
             </h2>
           </>
         )}
