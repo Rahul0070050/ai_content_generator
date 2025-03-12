@@ -102,7 +102,7 @@ function History() {
                   <td className="border p-4">{item.createdAt}</td>
                   <td className="border p-4">{item.aiResponse.length}</td>
                   <td className="border p-4 cursor-pointer">
-                    <Button className="border bg-slate-100">
+                    <Button className="border bg-slate-100 hover:text-white">
                       <Copy onClick={() => copyText(item.aiResponse)} />
                     </Button>
                   </td>
