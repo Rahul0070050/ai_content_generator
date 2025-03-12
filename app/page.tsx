@@ -11,7 +11,7 @@ const HomePage = () => {
           <div className="space-x-6">
             <a
               href="/dashboard"
-              className="font-bold text-gray-600 hover:text-indigo-600 transition-colors"
+              className="font-bold text-xl text-gray-600 hover:text-indigo-600 transition-colors"
             >
               Dashboard
             </a>
@@ -156,7 +156,7 @@ const HomePage = () => {
             Scriptify’s AI
           </p>
           <button className="bg-indigo-600 text-white font-semibold py-3 px-10 rounded-full hover:bg-indigo-700 transition-all duration-300 transform hover:scale-105">
-            Try It Free
+            <Link href="/dashboard">Try It Free</Link>
           </button>
         </div>
       </section>
